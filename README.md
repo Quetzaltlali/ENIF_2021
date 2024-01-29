@@ -8,7 +8,7 @@ Además, proporciona los elementos necesarios para construir una aplicación Shi
 ## Contenido
 
  **Scripts de Limpieza de Datos:**
-   - `tmodulo1_2015.R`: Limpiar los datos de la ENIF 2015.
-   - `tmodulo1_2018.R`: Limpiar los datos de la ENIF 2018.
-   - `tmodulo_2021.R`: Limpiar los datos de la ENIF 2021.
+   - `tmodulo1_2015.R`: Limpieza de datos de la ENIF 2015.
+   - `tmodulo1_2018.R`: Limpieza de datos de la ENIF 2018.
+   - `tmodulo_2021.R`: Limpieza de datos de la ENIF 2021.
 
