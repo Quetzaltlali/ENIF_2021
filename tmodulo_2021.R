@@ -19,6 +19,7 @@ rm(list = ls())
 
 #setwd("Desktop")  # Ajusta la ubicacion segun tu sistema
 #raiz <- setwd("C:\\[Tu ubicación]")
+#raiz <- setwd("C:\\Users\\IDSS3168\\OneDrive - Comision Nacional Bancaria y de Valores\\Documentos")
 raiz <- setwd("C:\\Users\\hp\\Documents\\PP")
 
 ## Crear folders de almacenamiento
