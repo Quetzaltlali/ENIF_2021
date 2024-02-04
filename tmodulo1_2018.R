@@ -123,6 +123,90 @@ tmodulo2_2018$uvh
 #                                 VARIABLES DE INTERES
 #_______________________________________________________________________________
 
+# Edad
+#_______________________________________________________________________________
+
+# Función para asignar grupos de edad para 2018
+grupos_edad_2018 <- function(age) {
+  if (age >= 18 & age <= 29) {
+    return("De 18 a 29 años")
+  } else if (age >= 30 & age <= 44) {
+    return("De 30 a 44 años")
+  } else if (age >= 45 & age <= 59) {
+    return("De 45 a 59 años")
+  } else if (age >= 60) {
+    return("Mayor a 60")
+  } else {
+    return(NULL)
+  }
+}
+
+tmodulo1_2018$grupo_edad <- sapply(tmodulo1_2018$edad, grupos_edad_2018)
+#_______________________________________________________________________________
+
+# Región
+#_______________________________________________________________________________
+# Función para asignar grupos de región
+grupos_region <- function(reg) {
+  if (reg == 1) {
+    return("Noroeste")
+  } else if (reg == 2) {
+    return("Noreste")
+  } else if (reg == 3) {
+    return("Occidente y Bajgráficoo")
+  } else if (reg == 4) {
+    return("Ciudad de Mgráficoxico")
+  } else if (reg == 5) {
+    return("Centro Sur y Oriente")
+  } else if (reg == 6) {
+    return("Sur")
+  } else {
+    return("Otro")
+  }
+}
+
+# Crear nueva columna "region" para crear los grupos de regiones:
+tmodulo1_2018$region <- sapply(tmodulo1_2018$region, grupos_region)  
+#_______________________________________________________________________________
+
+# Rural-Urbana
+#_______________________________________________________________________________
+tmodulo1_2018 <- tmodulo1_2018 %>%
+  mutate(tloc = case_when(
+    tloc == 1 ~ 4,
+    tloc == 2 ~ 3,
+    tloc == 3 ~ 2,
+    tloc == 4 ~ 1
+  ))
+
+# Diccionario de etiquetas para TLOC
+labels <- c("<2,500 habs", "2,500-14,999 habs", "15,00-99,999 habs", ">100,000 habs")
+levels(tmodulo1_2018$tloc) <- labels
+
+# Etiqueta de variable para TLOC
+attr(tmodulo1_2018$tloc, "label") <- "Tamaño de localidad"
+
+# Generamos variable de area para obtener las rurales y urbanas
+
+tmodulo1_2018 <- tmodulo1_2018 %>%
+  mutate(AREA = ifelse(tloc %in% c(1, 2), 1, 0))
+
+# Etiquetas para area
+labels_area <- c("Rural", "Urbana")
+levels(tmodulo1_2018$AREA) <- labels_area
+
+# Etiqueta de variable para rural
+attr(tmodulo1_2018$AREA, "label") <- "Poblacion rural y urbana 2018"
+
+#_______________________________________________________________________________
+
+# Sexo
+#_______________________________________________________________________________
+# Definir etiquetas para la variables
+tmodulo1_2018$sexo<- factor(tmodulo1_2018$sexo, labels = c("Hombre", "Mujer"))
+#_______________________________________________________________________________
+
+
 # 1) Nivel de escolaridad de la persona elegida (P3_1_1)
 #_______________________________________________________________________________
 tmodulo1_2018$niv_ed_dgasf <- 0
@@ -2452,7 +2536,7 @@ tmodulo1_2018$ind_comp_mca <- scale(tmodulo1_2018$ahorro +
 
 
 # Subindice de actitudes
-tmodulo1_2018$ind_act_mca <- scale(tmodulo1_2018$comp_pre2 + tmodulo1_2018$comp_pga2 + tmodulo1_2018$comp_dpg2)
+tmodulo1_2018$ind_act_mca <- scale(tmodulo1_2018$ind_act)
 
 # Indice de alfabetizacion por pca
 tmodulo1_2018$ind_fin_pca <- scale(tmodulo1_2018$ind_cono_mca + tmodulo1_2018$ind_comp_mca + tmodulo1_2018$ind_act_mca)
