@@ -69,16 +69,10 @@ file.remove("enif/enif_2021_bd_csv.zip")
 # Leer los tmodulo_2021
 #-------------------------------------------------------------------------------
 # 2021
-tmodulo_2021 <- read_csv("enif/enif_2021/TMODULO.csv") %>%
-  janitor::clean_names()
+tmodulo_2021 <- read.csv("enif/enif_2021/TMODULO.csv")
 #-------------------------------------------------------------------------------                          
 # Limpieza de tmodulo_2021 para el MODULO de la ENIF 2021 (archivo CSV)
 #-------------------------------------------------------------------------------
-tmodulo_2021 <- read.csv("enif/enif_2021/TMODULO.csv")
-
-# Reemplazar los valores NA por 100 en todo el tmodulo_2021frame
-#tmodulo_2021[is.na(tmodulo_2021) & names(tmodulo_2021) != "P3_8A"] <- 100
-
 # Cambiar el tipo de dato de las columnas "UPM_DIS," "VIV_SEL," y "HOGAR" a caracteres (strings)
 columnas_string <- c("UPM_DIS", "VIV_SEL", "HOGAR")
 tmodulo_2021 <- tmodulo_2021 %>% mutate(across(all_of(columnas_string), as.character))
@@ -98,6 +92,88 @@ tmodulo_2021$UVH
 #_______________________________________________________________________________
 
 #                                 VARIABLES DE INTERES
+#_______________________________________________________________________________
+
+# Edad
+#_______________________________________________________________________________
+# Función para asignar grupos de edad para 2021
+grupos_edad <- function(age) {
+  if (age >= 18 & age <= 29) {
+    return("De 18 a 29 años")
+  } else if (age >= 30 & age <= 44) {
+    return("De 30 a 44 años")
+  } else if (age >= 45 & age <= 59) {
+    return("De 45 a 59 años")
+  } else if (age >= 60) {
+    return("Mayor a 60")
+  } else {
+    return(NULL)
+  }
+}
+
+tmodulo_2021$grupo_etario <- sapply(tmodulo_2021$EDAD, grupos_edad)
+#_______________________________________________________________________________
+
+# Región
+#_______________________________________________________________________________
+# Función para asignar grupos de región
+grupos_region <- function(reg) {
+  if (reg == 1) {
+    return("Noroeste")
+  } else if (reg == 2) {
+    return("Noreste")
+  } else if (reg == 3) {
+    return("Occidente y Bajío")
+  } else if (reg == 4) {
+    return("Ciudad de México")
+  } else if (reg == 5) {
+    return("Centro Sur y Oriente")
+  } else if (reg == 6) {
+    return("Sur")
+  } else {
+    return("Otro")
+  }
+}
+
+# Crear nueva columna para crear los grupos de regiones:
+tmodulo_2021$GRUPO_REG <- sapply(tmodulo_2021$REGION, grupos_region)
+#_______________________________________________________________________________
+
+# Rural-Urbana
+#_______________________________________________________________________________
+tmodulo_2021 <- tmodulo_2021 %>%
+  mutate(TLOC = case_when(
+    TLOC == 1 ~ 4,
+    TLOC == 2 ~ 3,
+    TLOC == 3 ~ 2,
+    TLOC == 4 ~ 1
+  ))
+
+# Etiquetas para TLOC
+labels <- c("<2,500 habs", "2,500-14,999 habs", "15,00-99,999 habs", ">100,000 habs")
+
+levels(tmodulo_2021$TLOC) <- labels
+
+# Etiqueta de variable para TLOC
+attr(tmodulo_2021$TLOC, "label") <- "Tamaño de localidad"
+
+# Generamos variable de area para obtener las rurales y urbanas
+tmodulo_2021 <- tmodulo_2021 %>%
+mutate(area = ifelse(TLOC %in% c(1, 2), 1, 0))
+
+# Etiquetas para area
+labels_area <- c("Rural", "Urbana")
+levels(tmodulo_2021$area) <- labels_area
+
+# Etiqueta de variable para area
+attr(tmodulo_2021$area, "label") <- "Poblacion rural y urbana 2021"
+
+#_______________________________________________________________________________
+
+# Sexo
+#_______________________________________________________________________________
+# Definir etiquetas para la variables
+tmodulo_2021$SEXO <- factor(tmodulo_2021$SEXO, labels = c("Hombre", "Mujer"))
 #_______________________________________________________________________________
 
 # 1) Nivel de escolaridad de la persona elegida (P3_1_1)
@@ -2206,25 +2282,28 @@ print(var_P9_7)
 
 # 92) Actitudes financieras en vejez
 #_______________________________________________________________________________
-tmodulo1_2018$P9_9_1 <- ifelse(tmodulo2_2018$p9_9_1 == 1, 1, 0)
-tmodulo1_2018$p9_9_2 <- ifelse(tmodulo2_2018$p9_9_2 == 1, 1, 0)
-tmodulo1_2018$p9_9_3 <- ifelse(tmodulo2_2018$p9_9_3 == 1, 1, 0)
-tmodulo1_2018$p9_9_4 <- ifelse(tmodulo2_2018$p9_9_4 == 1, 1, 0)
-tmodulo1_2018$p9_9_5 <- ifelse(tmodulo2_2018$p9_9_5 == 1, 1, 0)
+tmodulo_2021$P9_8_1 <- ifelse(tmodulo_2021$P9_8_1 == 1, 1, 0)
+tmodulo_2021$P9_8_2 <- ifelse(tmodulo_2021$P9_8_2 == 1, 1, 0)
+tmodulo_2021$P9_8_3 <- ifelse(tmodulo_2021$P9_8_3 == 1, 1, 0)
+tmodulo_2021$P9_8_4 <- ifelse(tmodulo_2021$P9_8_4 == 1, 1, 0)
+tmodulo_2021$P9_8_5 <- ifelse(tmodulo_2021$P9_8_5 == 1, 1, 0)
+tmodulo_2021$P9_8_6 <- ifelse(tmodulo_2021$P9_8_6 == 1, 1, 0)
 
 # Renombrar columnas
-names(tmodulo1_2018)[names(tmodulo1_2018) == "p9_9_1"] <- "act_vej_gob"
-names(tmodulo1_2018)[names(tmodulo1_2018) == "p9_9_2"] <- "act_vej_afore"
-names(tmodulo1_2018)[names(tmodulo1_2018) == "p9_9_3"] <- "act_vej_bie"
-names(tmodulo1_2018)[names(tmodulo1_2018) == "p9_9_4"] <- "act_vej_din"
-names(tmodulo1_2018)[names(tmodulo1_2018) == "p9_9_5"] <- "act_vej_otr"
+names(tmodulo_2021)[names(tmodulo_2021) == "P9_8_1"] <- "act_vej_gob"
+names(tmodulo_2021)[names(tmodulo_2021) == "P9_8_2"] <- "act_vej_afore"
+names(tmodulo_2021)[names(tmodulo_2021) == "P9_8_3"] <- "act_vej_bie"
+names(tmodulo_2021)[names(tmodulo_2021) == "P9_8_4"] <- "act_vej_din"
+names(tmodulo_2021)[names(tmodulo_2021) == "P9_8_5"] <- "act_vej_tra"
+names(tmodulo_2021)[names(tmodulo_2021) == "P9_8_6"] <- "act_vej_otr"
 
-# Etiqueta para laS columnas
-attr(tmodulo1_2018$act_vej_gob, "label") <- "Piensa cubrir gastos vejez con apoyos gob"
-attr(tmodulo1_2018$act_vej_afore, "label") <- "Piensa cubrir gastos vejez con ahorro retiro"
-attr(tmodulo1_2018$act_vej_bie, "label") <- "Piensa cubrir gastos vejez con venta de bienes"
-attr(tmodulo1_2018$act_vej_din, "label") <- "Piensa cubrir gastos vejez con dinero de pareja o fam"
-attr(tmodulo1_2018$act_vej_otr, "label") <- "Piensa cubrir gastos vejez de otra forma"
+# Etiqueta para las columnas
+attr(tmodulo_2021$act_vej_gob, "label") <- "Piensa cubrir gastos vejez con apoyos gob"
+attr(tmodulo_2021$act_vej_afore, "label") <- "Piensa cubrir gastos vejez con ahorro retiro"
+attr(tmodulo_2021$act_vej_bie, "label") <- "Piensa cubrir gastos vejez con venta de bienes"
+attr(tmodulo_2021$act_vej_din, "label") <- "Piensa cubrir gastos vejez con dinero de pareja o fam"
+attr(tmodulo_2021$act_vej_tra, "label") <- "Piensa cubrir gastos vejez con lo que reciba de seguir trabajando"
+attr(tmodulo_2021$act_vej_otr, "label") <- "Piensa cubrir gastos vejez de otra forma"
 #####################################################################################
 
 # USO DE CANALES FINANCIEROS
@@ -2963,4 +3042,6 @@ tmodulo_2021$ind_act_mca <- scale(tmodulo_2021$comp_pre2 + tmodulo_2021$comp_pga
 tmodulo_2021$ind_fin_pca <- scale(tmodulo_2021$ind_cono_mca + tmodulo_2021$ind_comp_mca + tmodulo_2021$ind_act_mca)
 
 #####################################################################################
+# Cambia el directorio de trabajo al nuevo directorio "enif"
+setwd("enif")
 write.csv(tmodulo_2021, file = "tmodulo_2021_clean.csv", row.names = FALSE)
